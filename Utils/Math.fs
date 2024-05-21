@@ -1,4 +1,4 @@
-﻿module Utils.Math
+﻿module Utils.FSharp.Math
 
 /// Safe division function that will return Some/None instead of a potential NaN/DivideByZeroException
 let inline (/*/) (numerator: 'a) (denominator: 'a) =

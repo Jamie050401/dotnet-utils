@@ -1,8 +1,8 @@
-﻿module Utils.Test.DateTime
+﻿module Utils.FSharp.Tests.DateTime
 
 open System
 open NUnit.Framework
-open Utils.DateTime
+open Utils.FSharp.DateTime
 
 [<TestFixture>]
 type DateTimeTests () =

@@ -1,4 +1,4 @@
-﻿module Utils.DateTime
+﻿module Utils.FSharp.DateTime
 
 open System
 open Math

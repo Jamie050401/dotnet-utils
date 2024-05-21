@@ -1,7 +1,7 @@
-﻿module Utils.Test.Math
+﻿module Utils.FSharp.Tests.Math
 
 open NUnit.Framework
-open Utils.Math
+open Utils.FSharp.Math
 
 [<TestFixture>]
 type MathTests () =
