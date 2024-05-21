@@ -27,13 +27,28 @@ let getYearsBetweenTwoDates (d1: DateTime) (d2: DateTime) =
 let getCompleteYearsBetweenTwoDates (d1: DateTime) (d2: DateTime) =
     getYearsBetweenTwoDates |> getCompleteXBetweenTwoDates d1 d2
 
+let getRelativeYearsBetweenTwoDates (d1: DateTime) (d2: DateTime) (relativeDay: int) (relativeMonth: int) =
+    let earlierDate, laterDate = determineEarliestDate d1 d2
+    let relativeEarlierDate = DateTime (earlierDate.Year, relativeMonth, relativeDay)
+    let relativeLaterDate = DateTime (laterDate.Year, relativeMonth, relativeDay)
+
+    let relativeYears = getYearsBetweenTwoDates relativeEarlierDate relativeLaterDate
+    let earlierAdj = getYearsBetweenTwoDates earlierDate relativeEarlierDate * match earlierDate < relativeEarlierDate with | true -> 1.0 | false -> -1.0
+    let laterAdj = getYearsBetweenTwoDates laterDate relativeLaterDate * match laterDate < relativeLaterDate with | true -> -1.0 | false -> 1.0
+
+    relativeYears + earlierAdj + laterAdj + match laterDate >= relativeLaterDate with | true -> 0.0 | false -> -1.0
+
+let getCompleteRelativeYearsBetweenTwoDates (d1: DateTime) (d2: DateTime) (relativeDay: int) (relativeMonth: int) =
+    // TODO: Understand why this first statement does not work
+    //(relativeDay |> (relativeMonth |> getCustomYearsBetweenTwoDates)) |> getCompleteXBetweenTwoDates d1 d2
+    getRelativeYearsBetweenTwoDates d1 d2 relativeDay relativeMonth |> truncate |> int
+
 let getMonthsBetweenTwoDates (d1: DateTime) (d2: DateTime) =
     getYearsBetweenTwoDates d1 d2 |> (*) 12.0
 
 let getCompleteMonthsBetweenTwoDates (d1: DateTime) (d2: DateTime) =
     getMonthsBetweenTwoDates |> getCompleteXBetweenTwoDates d1 d2
 
-// TODO: Needs unit tests
 let getWeeksBetweenTwoDates (d1: DateTime) (d2: DateTime) =
     (getDaysBetweenTwoDates d1 d2) / 7.0
 

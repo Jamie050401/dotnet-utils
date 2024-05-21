@@ -196,3 +196,63 @@ type DateTimeTests () =
         let result = getCompleteMonthsBetweenTwoDates d1 d2
 
         Assert.That (result, Is.EqualTo 183)
+
+    [<Test>]
+    [<Category("DateTime")>]
+    member this.GetCompleteRelativeYearsBetweenTwoDates_TaxYears_Start1stJan2000_End1stJan2001 () =
+        let d1 = DateTime (2000, 1, 1)
+        let d2 = DateTime (2001, 1, 1)
+
+        let result = getCompleteRelativeYearsBetweenTwoDates d1 d2 6 4
+
+        Assert.That (result, Is.EqualTo 0)
+
+    [<Test>]
+    [<Category("DateTime")>]
+    member this.GetCompleteRelativeYearsBetweenTwoDates_TaxYears_Start1stJan2000_End6thApril2001 () =
+        let d1 = DateTime (2000, 1, 1)
+        let d2 = DateTime (2001, 4, 6)
+
+        let result = getCompleteRelativeYearsBetweenTwoDates d1 d2 6 4
+
+        Assert.That (result, Is.EqualTo 1)
+
+    [<Test>]
+    [<Category("DateTime")>]
+    member this.GetCompleteRelativeYearsBetweenTwoDates_TaxYears_Start6thApril2000_End6thApril2001 () =
+        let d1 = DateTime (2000, 4, 6)
+        let d2 = DateTime (2001, 4, 6)
+
+        let result = getCompleteRelativeYearsBetweenTwoDates d1 d2 6 4
+
+        Assert.That (result, Is.EqualTo 1)
+
+    [<Test>]
+    [<Category("DateTime")>]
+    member this.GetCompleteRelativeYearsBetweenTwoDates_TaxYears_Start5thApril2000_End7thApril2001 () =
+        let d1 = DateTime (2000, 4, 5)
+        let d2 = DateTime (2001, 4, 7)
+
+        let result = getCompleteRelativeYearsBetweenTwoDates d1 d2 6 4
+
+        Assert.That (result, Is.EqualTo 1)
+
+    [<Test>]
+    [<Category("DateTime")>]
+    member this.GetCompleteRelativeYearsBetweenTwoDates_TaxYears_Start1stJan2000_End31stDec2015 () =
+        let d1 = DateTime (2000, 1, 1)
+        let d2 = DateTime (2015, 12, 31)
+
+        let result = getCompleteRelativeYearsBetweenTwoDates d1 d2 6 4
+
+        Assert.That (result, Is.EqualTo 15)
+
+    [<Test>]
+    [<Category("DateTime")>]
+    member this.GetCompleteRelativeYearsBetweenTwoDates_TaxYears_Start7thApril2000_End5thApril2001 () =
+        let d1 = DateTime (2000, 4, 7)
+        let d2 = DateTime (2001, 4, 5)
+
+        let result = getCompleteRelativeYearsBetweenTwoDates d1 d2 6 4
+
+        Assert.That (result, Is.EqualTo 0)
