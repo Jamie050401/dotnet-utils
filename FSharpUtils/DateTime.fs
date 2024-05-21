@@ -7,11 +7,11 @@ let private determineEarliestDate (d1: DateTime) (d2: DateTime) =
     | true  -> d1, d2
     | false -> d2, d1
 
-let getDaysBetweenTwoDates (d1: DateTime) (d2: DateTime) =
-    abs (d1 - d2).TotalDays
-
 let private getCompleteXBetweenTwoDates (d1: DateTime) (d2: DateTime) (func: DateTime -> DateTime -> float) =
     func d1 d2 |> truncate |> int
+
+let getDaysBetweenTwoDates (d1: DateTime) (d2: DateTime) =
+    abs (d1 - d2).TotalDays
 
 let getCompleteDaysBetweenTwoDates (d1: DateTime) (d2: DateTime) =
     getDaysBetweenTwoDates |> getCompleteXBetweenTwoDates d1 d2
@@ -32,3 +32,11 @@ let getMonthsBetweenTwoDates (d1: DateTime) (d2: DateTime) =
 
 let getCompleteMonthsBetweenTwoDates (d1: DateTime) (d2: DateTime) =
     getMonthsBetweenTwoDates |> getCompleteXBetweenTwoDates d1 d2
+
+// TODO: Needs unit tests
+let getWeeksBetweenTwoDates (d1: DateTime) (d2: DateTime) =
+    (getDaysBetweenTwoDates d1 d2) / 7.0
+
+// TODO: Needs unit tests
+let getCompleteWeeksBetweenTwoDates (d1: DateTime) (d2: DateTime) =
+    getWeeksBetweenTwoDates |> getCompleteXBetweenTwoDates d1 d2

@@ -61,4 +61,24 @@ public static class DateTimeExtensions
     {
         return GetCompleteMonthsBetweenTwoDates(startDate, targetDate);
     }
+
+    public static double GetWeeksBetweenTwoDates(DateTime d1, DateTime d2)
+    {
+        return FSharp.DateTime.getWeeksBetweenTwoDates(d1, d2);
+    }
+
+    public static double GetWeeksToTargetDate(this DateTime startDate, DateTime targetDate)
+    {
+        return GetWeeksBetweenTwoDates(startDate, targetDate);
+    }
+
+    public static int GetCompleteWeeksBetweenTwoDates(DateTime d1, DateTime d2)
+    {
+        return FSharp.DateTime.getCompleteWeeksBetweenTwoDates(d1, d2);
+    }
+
+    public static int GetCompleteWeeksToTargetDate(this DateTime startDate, DateTime targetDate)
+    {
+        return GetCompleteWeeksBetweenTwoDates(startDate, targetDate);
+    }
 }
