@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Utils\FSharpUtils.fsproj" />
+    <ProjectReference Include="..\FSharpUtils\FSharpUtils.fsproj" />
   </ItemGroup>
 
 </Project>
