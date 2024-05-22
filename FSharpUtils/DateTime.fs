@@ -27,7 +27,7 @@ let getYearsBetweenTwoDates (d1: DateTime) (d2: DateTime) =
 let getCompleteYearsBetweenTwoDates (d1: DateTime) (d2: DateTime) =
     getYearsBetweenTwoDates |> getCompleteXBetweenTwoDates d1 d2
 
-let getRelativeYearsBetweenTwoDates (d1: DateTime) (d2: DateTime) (relativeDay: int) (relativeMonth: int) =
+let getRelativeYearsBetweenTwoDates (relativeDay: int) (relativeMonth: int) (d1: DateTime) (d2: DateTime) =
     let earlierDate, laterDate = determineEarliestDate d1 d2
     let relativeEarlierDate = DateTime (earlierDate.Year, relativeMonth, relativeDay)
     let relativeLaterDate = DateTime (laterDate.Year, relativeMonth, relativeDay)
@@ -38,10 +38,14 @@ let getRelativeYearsBetweenTwoDates (d1: DateTime) (d2: DateTime) (relativeDay: 
 
     relativeYears + earlierAdj + laterAdj + match laterDate >= relativeLaterDate with | true -> 0.0 | false -> -1.0
 
-let getCompleteRelativeYearsBetweenTwoDates (d1: DateTime) (d2: DateTime) (relativeDay: int) (relativeMonth: int) =
-    // TODO: Understand why this first statement does not work
-    //(relativeDay |> (relativeMonth |> getCustomYearsBetweenTwoDates)) |> getCompleteXBetweenTwoDates d1 d2
-    getRelativeYearsBetweenTwoDates d1 d2 relativeDay relativeMonth |> truncate |> int
+let getCompleteRelativeYearsBetweenTwoDates (relativeDay: int) (relativeMonth: int) (d1: DateTime) (d2: DateTime) =
+    relativeMonth |> (relativeDay |> getRelativeYearsBetweenTwoDates) |> getCompleteXBetweenTwoDates d1 d2
+
+let getTaxYearsBetweenTwoDates (d1: DateTime) (d2: DateTime) =
+    getRelativeYearsBetweenTwoDates 6 4 d1 d2
+
+let getCompleteTaxYearsBetweenTwoDates (d1: DateTime) (d2: DateTime) =
+    getCompleteRelativeYearsBetweenTwoDates 6 4 d1 d2
 
 let getMonthsBetweenTwoDates (d1: DateTime) (d2: DateTime) =
     getYearsBetweenTwoDates d1 d2 |> (*) 12.0
@@ -52,6 +56,5 @@ let getCompleteMonthsBetweenTwoDates (d1: DateTime) (d2: DateTime) =
 let getWeeksBetweenTwoDates (d1: DateTime) (d2: DateTime) =
     (getDaysBetweenTwoDates d1 d2) / 7.0
 
-// TODO: Needs unit tests
 let getCompleteWeeksBetweenTwoDates (d1: DateTime) (d2: DateTime) =
     getWeeksBetweenTwoDates |> getCompleteXBetweenTwoDates d1 d2

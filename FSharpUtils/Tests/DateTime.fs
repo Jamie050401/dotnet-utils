@@ -169,7 +169,7 @@ type DateTimeTests () =
 
     [<Test>]
     [<Category("DateTime")>]
-    member this.GetCompleteMonthsBetweenTwoDates_Start1stJan2000_End1stMarch2015 () =
+    member this.GetCompleteMonthsBetweenTwoDates_Start1stJan2000_End1stMar2015 () =
         let d1 = DateTime (2000, 1, 1)
         let d2 = DateTime (2015, 3, 1)
 
@@ -179,7 +179,7 @@ type DateTimeTests () =
 
     [<Test>]
     [<Category("DateTime")>]
-    member this.GetCompleteMonthsBetweenTwoDates_Start1stJan2000_End2ndMarch2015 () =
+    member this.GetCompleteMonthsBetweenTwoDates_Start1stJan2000_End2ndMar2015 () =
         let d1 = DateTime (2000, 1, 1)
         let d2 = DateTime (2015, 3, 2)
 
@@ -189,7 +189,7 @@ type DateTimeTests () =
 
     [<Test>]
     [<Category("DateTime")>]
-    member this.GetCompleteMonthsBetweenTwoDates_Start1stJan2000_End1stApril2015 () =
+    member this.GetCompleteMonthsBetweenTwoDates_Start1stJan2000_End1stApr2015 () =
         let d1 = DateTime (2000, 1, 1)
         let d2 = DateTime (2015, 4, 1)
 
@@ -203,56 +203,86 @@ type DateTimeTests () =
         let d1 = DateTime (2000, 1, 1)
         let d2 = DateTime (2001, 1, 1)
 
-        let result = getCompleteRelativeYearsBetweenTwoDates d1 d2 6 4
+        let result = getCompleteRelativeYearsBetweenTwoDates 6 4 d1 d2
 
         Assert.That (result, Is.EqualTo 0)
 
     [<Test>]
     [<Category("DateTime")>]
-    member this.GetCompleteRelativeYearsBetweenTwoDates_TaxYears_Start1stJan2000_End6thApril2001 () =
+    member this.GetCompleteRelativeYearsBetweenTwoDates_TaxYears_Start1stJan2000_End6thApr2001 () =
         let d1 = DateTime (2000, 1, 1)
         let d2 = DateTime (2001, 4, 6)
 
-        let result = getCompleteRelativeYearsBetweenTwoDates d1 d2 6 4
+        let result = getCompleteRelativeYearsBetweenTwoDates 6 4 d1 d2
 
         Assert.That (result, Is.EqualTo 1)
 
     [<Test>]
     [<Category("DateTime")>]
-    member this.GetCompleteRelativeYearsBetweenTwoDates_TaxYears_Start6thApril2000_End6thApril2001 () =
+    member this.GetCompleteRelativeYearsBetweenTwoDates_TaxYears_Start6thApr2000_End6thApr2001 () =
         let d1 = DateTime (2000, 4, 6)
         let d2 = DateTime (2001, 4, 6)
 
-        let result = getCompleteRelativeYearsBetweenTwoDates d1 d2 6 4
+        let result = getCompleteRelativeYearsBetweenTwoDates 6 4 d1 d2
 
         Assert.That (result, Is.EqualTo 1)
 
     [<Test>]
     [<Category("DateTime")>]
-    member this.GetCompleteRelativeYearsBetweenTwoDates_TaxYears_Start5thApril2000_End7thApril2001 () =
+    member this.GetCompleteRelativeYearsBetweenTwoDates_TaxYears_Start6thApr2000_End1stJan2001 () =
+        let d1 = DateTime (2000, 4, 6)
+        let d2 = DateTime (2001, 1, 1)
+
+        let result = getCompleteRelativeYearsBetweenTwoDates 6 4 d1 d2
+
+        Assert.That (result, Is.EqualTo 0)
+
+    [<Test>]
+    [<Category("DateTime")>]
+    member this.GetCompleteRelativeYearsBetweenTwoDates_TaxYears_Start5thApr2000_End7thApr2001 () =
         let d1 = DateTime (2000, 4, 5)
         let d2 = DateTime (2001, 4, 7)
 
-        let result = getCompleteRelativeYearsBetweenTwoDates d1 d2 6 4
+        let result = getCompleteRelativeYearsBetweenTwoDates 6 4 d1 d2
 
         Assert.That (result, Is.EqualTo 1)
 
     [<Test>]
     [<Category("DateTime")>]
-    member this.GetCompleteRelativeYearsBetweenTwoDates_TaxYears_Start1stJan2000_End31stDec2015 () =
+    member this.GetCompleteTaxYearsBetweenTwoDates_TaxYears_Start1stJan2000_End31stDec2015 () =
         let d1 = DateTime (2000, 1, 1)
         let d2 = DateTime (2015, 12, 31)
 
-        let result = getCompleteRelativeYearsBetweenTwoDates d1 d2 6 4
+        let result = getCompleteTaxYearsBetweenTwoDates d1 d2
 
         Assert.That (result, Is.EqualTo 15)
 
     [<Test>]
     [<Category("DateTime")>]
-    member this.GetCompleteRelativeYearsBetweenTwoDates_TaxYears_Start7thApril2000_End5thApril2001 () =
+    member this.GetCompleteTaxYearsBetweenTwoDates_TaxYears_Start7thApr2000_End5thApr2001 () =
         let d1 = DateTime (2000, 4, 7)
         let d2 = DateTime (2001, 4, 5)
 
-        let result = getCompleteRelativeYearsBetweenTwoDates d1 d2 6 4
+        let result = getCompleteTaxYearsBetweenTwoDates d1 d2
 
         Assert.That (result, Is.EqualTo 0)
+
+    [<Test>]
+    [<Category("DateTime")>]
+    member this.GetCompleteWeeksBetweenTwoDates_Start1stJan2000_End1stFeb2000 () =
+        let d1 = DateTime (2000, 1, 1)
+        let d2 = DateTime (2000, 2, 1)
+
+        let result = getCompleteWeeksBetweenTwoDates d1 d2
+
+        Assert.That (result, Is.EqualTo 4)
+
+    [<Test>]
+    [<Category("DateTime")>]
+    member this.GetCompleteWeeksBetweenTwoDates_Start1stJan2000_End1stJan2010 () =
+        let d1 = DateTime (2000, 1, 1)
+        let d2 = DateTime (2010, 1, 1)
+
+        let result = getCompleteWeeksBetweenTwoDates d1 d2
+
+        Assert.That (result, Is.EqualTo 521)
