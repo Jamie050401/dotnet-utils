@@ -5,7 +5,36 @@
 	<LangVersion>10</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>dotnet-utils</PackageId>
+    <Title>.NET Utils</Title>
+    <Authors>Jamie050401</Authors>
+    <Description>Collection of common functions for use in C# and F#</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/Jamie050401/dotnet-utils</RepositoryUrl>
+    <PackageOutputPath>..\Publish\$(Configuration)</PackageOutputPath>
+    <NeutralLanguage>en-GB</NeutralLanguage>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
+
+  <Target Name="Copy" AfterTargets="AfterBuild">
+    <ItemGroup>
+      <SrcFiles Include="$(TargetDir)**\*.*" />
+	</ItemGroup>
+	<Copy SourceFiles="@(SrcFiles)" DestinationFolder="..\Build\$(Configuration)\%(RecursiveDir)" />
+  </Target>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>true</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\README.md">
+      <Pack>true</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\FSharpUtils\FSharpUtils.fsproj" />
