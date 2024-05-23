@@ -4,7 +4,11 @@ type KeyValuePair<'TKey, 'TValue> = System.Collections.Generic.KeyValuePair<'TKe
 
 module KeyValuePair =
     let create (key: 'TKey) (value: 'TValue) =
+#if NET48
+        new System.Collections.Generic.KeyValuePair<'TKey, 'TValue> (key, value)
+#else
         System.Collections.Generic.KeyValuePair.Create (key, value)
+#endif
 
     let ofTuple (key: 'TKey, value: 'TValue) =
         create key value

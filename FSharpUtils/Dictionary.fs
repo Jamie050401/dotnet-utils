@@ -13,4 +13,12 @@ module Dictionary =
         dictionary.ContainsKey key
 
     let create (data: KeyValuePair<'TKey, 'TValue> seq) =
+#if NET48
+        let dictionary = Dictionary<'TKey, 'TValue> ()
+        data |> Seq.iter (fun (keyValuePair: KeyValuePair<'TKey, 'TValue>) ->
+            dictionary |> add keyValuePair.Key keyValuePair.Value
+        )
+        dictionary
+#else
         new Dictionary<'TKey, 'TValue> (data)
+#endif
