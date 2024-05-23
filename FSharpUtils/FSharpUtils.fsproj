@@ -1,19 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0; net7.0; net6.0; net48; netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>net8.0; net7.0; net6.0</TargetFrameworks>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <RootNamespace>Utils.FSharp</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="KeyValuePair.fs" />
+    <Compile Include="Dictionary.fs" />
     <Compile Include="Option.fs" />
     <Compile Include="Math.fs" />
     <Compile Include="DateTime.fs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FSharp.Core" Version="8.0.300" />
+    <PackageReference Update="FSharp.Core" Version="8.0.300" />
   </ItemGroup>
 
   <Target Name="Copy" AfterTargets="AfterBuild">
