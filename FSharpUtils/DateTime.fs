@@ -27,25 +27,49 @@ let getYearsBetweenTwoDates (d1: DateTime) (d2: DateTime) =
 let getCompleteYearsBetweenTwoDates (d1: DateTime) (d2: DateTime) =
     getYearsBetweenTwoDates |> getCompleteXBetweenTwoDates d1 d2
 
-let getRelativeYearsBetweenTwoDates (relativeDay: int) (relativeMonth: int) (d1: DateTime) (d2: DateTime) =
+let getCompleteRelativeYearsBetweenTwoDates (d1: DateTime) (d2: DateTime) (relativeDay: int) (relativeMonth: int) =
+    let (|BeforeRelativeMonth|OnRelativeMonth|AfterRelativeMonth|) (date: DateTime) =
+        match date.Month < relativeMonth with
+        | true ->
+            BeforeRelativeMonth
+        | false ->
+            match date.Month > relativeMonth with
+            | true  -> AfterRelativeMonth
+            | false -> OnRelativeMonth
+
+    let (|BeforeRelativeDay|OnRelativeDay|AfterRelativeDay|) (date: DateTime) =
+        match date.Day < relativeDay with
+        | true ->
+            BeforeRelativeDay
+        | false ->
+            match date.Day > relativeDay with
+            | true  -> AfterRelativeDay
+            | false -> OnRelativeDay
+
+    let getNextRelativeYearStart (date: DateTime) =
+        match date, date with
+        | BeforeRelativeMonth, _
+        | OnRelativeMonth, BeforeRelativeDay
+        | OnRelativeMonth, OnRelativeDay     -> DateTime (date.Year, relativeMonth, relativeDay)
+        | _                                  -> DateTime (date.Year + 1, relativeMonth, relativeDay)
+
+    let getPrevRelativeYearStart (date: DateTime) =
+        match date, date with
+        | BeforeRelativeMonth, _
+        | OnRelativeMonth, BeforeRelativeDay -> DateTime (date.Year - 1, relativeMonth, relativeDay)
+        | _                                  -> DateTime (date.Year, relativeMonth, relativeDay)
+
+
     let earlierDate, laterDate = determineEarliestDate d1 d2
-    let relativeEarlierDate = DateTime (earlierDate.Year, relativeMonth, relativeDay)
-    let relativeLaterDate = DateTime (laterDate.Year, relativeMonth, relativeDay)
+    let relativeEarlierDate = getNextRelativeYearStart earlierDate
+    let relativeLaterDate = getPrevRelativeYearStart laterDate
 
-    let relativeYears = getYearsBetweenTwoDates relativeEarlierDate relativeLaterDate
-    let earlierAdj = getYearsBetweenTwoDates earlierDate relativeEarlierDate * match earlierDate < relativeEarlierDate with | true -> 1.0 | false -> -1.0
-    let laterAdj = getYearsBetweenTwoDates laterDate relativeLaterDate * match laterDate < relativeLaterDate with | true -> -1.0 | false -> 1.0
-
-    relativeYears + earlierAdj + laterAdj + match laterDate >= relativeLaterDate with | true -> 0.0 | false -> -1.0
-
-let getCompleteRelativeYearsBetweenTwoDates (relativeDay: int) (relativeMonth: int) (d1: DateTime) (d2: DateTime) =
-    relativeMonth |> (relativeDay |> getRelativeYearsBetweenTwoDates) |> getCompleteXBetweenTwoDates d1 d2
-
-let getTaxYearsBetweenTwoDates (d1: DateTime) (d2: DateTime) =
-    getRelativeYearsBetweenTwoDates 6 4 d1 d2
+    match relativeLaterDate <= relativeEarlierDate with
+    | true  -> 0
+    | false -> getCompleteYearsBetweenTwoDates relativeEarlierDate relativeLaterDate
 
 let getCompleteTaxYearsBetweenTwoDates (d1: DateTime) (d2: DateTime) =
-    getCompleteRelativeYearsBetweenTwoDates 6 4 d1 d2
+    getCompleteRelativeYearsBetweenTwoDates d1 d2 6 4
 
 let getMonthsBetweenTwoDates (d1: DateTime) (d2: DateTime) =
     getYearsBetweenTwoDates d1 d2 |> (*) 12.0

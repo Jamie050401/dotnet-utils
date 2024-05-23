@@ -203,7 +203,17 @@ type DateTimeTests () =
         let d1 = DateTime (2000, 1, 1)
         let d2 = DateTime (2001, 1, 1)
 
-        let result = getCompleteRelativeYearsBetweenTwoDates 6 4 d1 d2
+        let result = getCompleteRelativeYearsBetweenTwoDates d1 d2 6 4
+
+        Assert.That (result, Is.EqualTo 0)
+
+    [<Test>]
+    [<Category("DateTime")>]
+    member this.GetCompleteRelativeYearsBetweenTwoDates_TaxYears_Start1stJan2000_End1stFeb2001 () =
+        let d1 = DateTime (2000, 1, 1)
+        let d2 = DateTime (2001, 2, 1)
+
+        let result = getCompleteRelativeYearsBetweenTwoDates d1 d2 6 4
 
         Assert.That (result, Is.EqualTo 0)
 
@@ -213,7 +223,7 @@ type DateTimeTests () =
         let d1 = DateTime (2000, 1, 1)
         let d2 = DateTime (2001, 4, 6)
 
-        let result = getCompleteRelativeYearsBetweenTwoDates 6 4 d1 d2
+        let result = getCompleteRelativeYearsBetweenTwoDates d1 d2 6 4
 
         Assert.That (result, Is.EqualTo 1)
 
@@ -223,7 +233,7 @@ type DateTimeTests () =
         let d1 = DateTime (2000, 4, 6)
         let d2 = DateTime (2001, 4, 6)
 
-        let result = getCompleteRelativeYearsBetweenTwoDates 6 4 d1 d2
+        let result = getCompleteRelativeYearsBetweenTwoDates d1 d2 6 4
 
         Assert.That (result, Is.EqualTo 1)
 
@@ -233,7 +243,7 @@ type DateTimeTests () =
         let d1 = DateTime (2000, 4, 6)
         let d2 = DateTime (2001, 1, 1)
 
-        let result = getCompleteRelativeYearsBetweenTwoDates 6 4 d1 d2
+        let result = getCompleteRelativeYearsBetweenTwoDates d1 d2 6 4
 
         Assert.That (result, Is.EqualTo 0)
 
@@ -243,7 +253,7 @@ type DateTimeTests () =
         let d1 = DateTime (2000, 4, 5)
         let d2 = DateTime (2001, 4, 7)
 
-        let result = getCompleteRelativeYearsBetweenTwoDates 6 4 d1 d2
+        let result = getCompleteRelativeYearsBetweenTwoDates d1 d2 6 4
 
         Assert.That (result, Is.EqualTo 1)
 

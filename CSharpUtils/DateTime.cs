@@ -42,34 +42,14 @@ public static class DateTimeExtensions
         return GetCompleteYearsBetweenTwoDates(startDate, targetDate);
     }
 
-    public static double GetRelativeYearsBetweenTwoDates(DateTime d1, DateTime d2, int relativeDay, int relativeMonth)
-    {
-        return FSharp.DateTime.getRelativeYearsBetweenTwoDates(relativeDay, relativeMonth, d1, d2);
-    }
-
-    public static double GetRelativeYearsToTargetDate(this DateTime startDate, DateTime targetDate, int relativeDay, int relativeMonth)
-    {
-        return GetRelativeYearsBetweenTwoDates(startDate, targetDate, relativeDay, relativeMonth);
-    }
-
     public static int GetCompleteRelativeYearsBetweenTwoDates(DateTime d1, DateTime d2, int relativeDay, int relativeMonth)
     {
-        return FSharp.DateTime.getCompleteRelativeYearsBetweenTwoDates(relativeDay, relativeMonth, d1, d2);
+        return FSharp.DateTime.getCompleteRelativeYearsBetweenTwoDates(d1, d2, relativeDay, relativeMonth);
     }
 
     public static int GetCompleteRelativeYearsToTargetDate(this DateTime startDate, DateTime targetDate, int relativeDay, int relativeMonth)
     {
         return GetCompleteRelativeYearsBetweenTwoDates(startDate, targetDate, relativeDay, relativeMonth);
-    }
-
-    public static double GetTaxYearsBetweenTwoDates(DateTime d1, DateTime d2)
-    {
-        return FSharp.DateTime.getTaxYearsBetweenTwoDates(d1, d2);
-    }
-
-    public static double GetTaxYearsToTargetDate(this DateTime startDate, DateTime targetDate)
-    {
-        return GetTaxYearsBetweenTwoDates(startDate, targetDate);
     }
 
     public static int GetCompleteTaxYearsBetweenTwoDates(DateTime d1, DateTime d2)
