@@ -1,25 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0; net7.0; net6.0; net48</TargetFrameworks>
+    <TargetFrameworks>net8.0; net7.0; net6.0; net48; netstandard2.1</TargetFrameworks>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <RootNamespace>Utils.FSharp</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Include="Option.fs" />
     <Compile Include="Math.fs" />
     <Compile Include="DateTime.fs" />
-    <Compile Include="Tests\Math.fs" />
-    <Compile Include="Tests\DateTime.fs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="NUnit" Version="4.1.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Update="FSharp.Core" Version="8.0.300" />
   </ItemGroup>
+
+  <Target Name="Copy" AfterTargets="AfterBuild">
+    <ItemGroup>
+      <SrcFiles Include="$(TargetDir)**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(SrcFiles)" DestinationFolder="..\Build\$(Configuration)\dotnet-utils-fsharp\%(RecursiveDir)" />
+  </Target>
 
 </Project>

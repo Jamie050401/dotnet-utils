@@ -1,10 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	<TargetFrameworks>net8.0; net7.0; net6.0; net48</TargetFrameworks>
-	<LangVersion>10</LangVersion>
+    <TargetFrameworks>net8.0; net7.0; net6.0; net48; netstandard2.1</TargetFrameworks>
+    <LangVersion>10</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <RootNamespace>Utils.CSharp</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>dotnet-utils</PackageId>
     <Title>.NET Utils</Title>
@@ -16,14 +17,8 @@
     <NeutralLanguage>en-GB</NeutralLanguage>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeFSharpUtils</TargetsForTfmSpecificBuildOutput>
   </PropertyGroup>
-
-  <Target Name="Copy" AfterTargets="AfterBuild">
-    <ItemGroup>
-      <SrcFiles Include="$(TargetDir)**\*.*" />
-	</ItemGroup>
-	<Copy SourceFiles="@(SrcFiles)" DestinationFolder="..\Build\$(Configuration)\%(RecursiveDir)" />
-  </Target>
 
   <ItemGroup>
     <None Include="..\LICENSE">
@@ -37,7 +32,24 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FSharpUtils\FSharpUtils.fsproj" />
+    <PackageReference Include="FSharp.Core" Version="8.0.300" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FSharpUtils\FSharpUtils.fsproj" PrivateAssets="All" />
+  </ItemGroup>
+
+  <Target Name="IncludeFSharpUtils">
+    <ItemGroup>
+      <BuildOutputInPackage Include="$(OutputPath)FSharpUtils.dll" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="Copy" AfterTargets="AfterBuild">
+    <ItemGroup>
+      <SrcFiles Include="$(TargetDir)**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(SrcFiles)" DestinationFolder="..\Build\$(Configuration)\dotnet-utils\%(RecursiveDir)" />
+  </Target>
 
 </Project>
