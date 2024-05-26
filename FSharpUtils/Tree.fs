@@ -1,4 +1,4 @@
-﻿namespace Utils.FSharp
+﻿module Utils.FSharp.Tree
 
 type Node<'T> = {
     Value: 'T

@@ -1,8 +1,10 @@
-﻿namespace Utils.FSharp
+﻿module Utils.FSharp.Dictionary
 
 type Dictionary<'TKey, 'TValue> = System.Collections.Generic.Dictionary<'TKey, 'TValue>
 
 module Dictionary =
+    open KeyValuePair
+
     // TODO: Add unit tests
     let add key value (dictionary: Dictionary<'TKey, 'TValue>) =
         dictionary.Add (key, value)
@@ -24,5 +26,5 @@ module Dictionary =
         )
         dictionary
 #else
-        new Dictionary<'TKey, 'TValue> (data)
+        Dictionary<'TKey, 'TValue> (data)
 #endif
