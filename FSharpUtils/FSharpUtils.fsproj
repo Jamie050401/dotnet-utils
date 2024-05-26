@@ -7,11 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="KeyValuePair.fs" />
-    <Compile Include="Dictionary.fs" />
     <Compile Include="Option.fs" />
     <Compile Include="Math.fs" />
     <Compile Include="DateTime.fs" />
+    <Compile Include="Tree.fs" />
+    <Compile Include="KeyValuePair.fs" />
+    <Compile Include="Dictionary.fs" />
   </ItemGroup>
 
   <ItemGroup>
