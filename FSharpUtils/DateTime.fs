@@ -2,13 +2,31 @@
 
 open System
 
+let private getCompleteXBetweenTwoDates (d1: DateTime) (d2: DateTime) (func: DateTime -> DateTime -> float) =
+    func d1 d2 |> truncate |> int
+
+let private monthToYear month =
+    month / 12.0
+
+let private dayToMonth (daysInMonth: float) day =
+    day / daysInMonth
+
+let private hourToDay hour =
+    hour / 24.0
+
+let private minuteToHour minute =
+    minute / 60.0
+
+let private secondToMinute second =
+    second / 60.0
+
+let private millisecondToSecond millisecond =
+    millisecond / 1000.0
+
 let private determineEarliestDate (d1: DateTime) (d2: DateTime) =
     match d1 <= d2 with
     | true  -> d1, d2
     | false -> d2, d1
-
-let private getCompleteXBetweenTwoDates (d1: DateTime) (d2: DateTime) (func: DateTime -> DateTime -> float) =
-    func d1 d2 |> truncate |> int
 
 let getDaysBetweenTwoDates (d1: DateTime) (d2: DateTime) =
     abs (d1 - d2).TotalDays
@@ -18,11 +36,17 @@ let getCompleteDaysBetweenTwoDates (d1: DateTime) (d2: DateTime) =
 
 let getYearsBetweenTwoDates (d1: DateTime) (d2: DateTime) =
     let earlierDate, laterDate = determineEarliestDate d1 d2
-    let yearsFromYears = float (laterDate.Year - earlierDate.Year)
-    let yearsFromMonths = float (laterDate.Month - earlierDate.Month) / 12.0
-    let yearsFromDays = (float (laterDate.Day - earlierDate.Day) / float (DateTime.DaysInMonth (laterDate.Year, laterDate.Month))) / 12.0
+    let dayToMonth = dayToMonth (DateTime.DaysInMonth (laterDate.Year, laterDate.Month))
 
-    yearsFromYears + yearsFromMonths + yearsFromDays
+    let yearsFromYears = float (laterDate.Year - earlierDate.Year)
+    let yearsFromMonths = float (laterDate.Month - earlierDate.Month) |> monthToYear
+    let yearsFromDays = float (laterDate.Day - earlierDate.Day) |> dayToMonth |> monthToYear
+    let yearsFromHours = float (laterDate.Hour - earlierDate.Hour) |> hourToDay |> dayToMonth |> monthToYear
+    let yearsFromMinutes = float (laterDate.Minute - earlierDate.Minute) |> minuteToHour |> hourToDay |> dayToMonth |> monthToYear
+    let yearsFromSeconds = float (laterDate.Second - earlierDate.Second) |> secondToMinute |> minuteToHour |> hourToDay |> dayToMonth |> monthToYear
+    let yearsFromMilliseconds = float (laterDate.Millisecond - earlierDate.Millisecond) |> millisecondToSecond |> secondToMinute |> minuteToHour |> hourToDay |> dayToMonth |> monthToYear
+
+    yearsFromYears + yearsFromMonths + yearsFromDays + yearsFromHours + yearsFromMinutes + yearsFromSeconds + yearsFromMilliseconds
 
 let getCompleteYearsBetweenTwoDates (d1: DateTime) (d2: DateTime) =
     getYearsBetweenTwoDates |> getCompleteXBetweenTwoDates d1 d2

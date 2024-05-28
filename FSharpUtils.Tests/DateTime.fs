@@ -119,6 +119,16 @@ type DateTimeTests () =
 
     [<Test>]
     [<Category("DateTime")>]
+    member this.GetCompleteYearsBetweenTwoDates_Start1stJan2000_Ends31stDec2009 () =
+        let d1 = DateTime (2000, 1, 1)
+        let d2 = DateTime (2009, 12, 31, 23, 59, 59)
+
+        let result = getCompleteYearsBetweenTwoDates d1 d2
+
+        Assert.That (result, Is.EqualTo 9)
+
+    [<Test>]
+    [<Category("DateTime")>]
     member this.GetCompleteMonthsBetweenTwoDates_Start1stJan2000_End1stJan2001 () =
         let d1 = DateTime (2000, 1, 1)
         let d2 = DateTime (2001, 1, 1)
