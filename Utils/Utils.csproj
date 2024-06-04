@@ -1,11 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0; net7.0; net6.0; net48; netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>net8.0; net7.0; net6.0; netstandard2.1</TargetFrameworks>
     <LangVersion>10</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>Utils.CSharp</RootNamespace>
+    <RootNamespace>Utils</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>dotnet-utils</PackageId>
     <Title>.NET Utils</Title>
@@ -13,7 +16,7 @@
     <Description>Collection of common functions for use in C# and F#</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/Jamie050401/dotnet-utils</RepositoryUrl>
-    <PackageOutputPath>..\Publish\$(Configuration)</PackageOutputPath>
+    <PackageOutputPath>..\_Packages\$(Configuration)</PackageOutputPath>
     <NeutralLanguage>en-GB</NeutralLanguage>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
@@ -53,7 +56,7 @@
     <ItemGroup>
       <SrcFiles Include="$(TargetDir)**\*.*" />
     </ItemGroup>
-    <Copy SourceFiles="@(SrcFiles)" DestinationFolder="..\Build\$(Configuration)\dotnet-utils\%(RecursiveDir)" />
+    <Copy SourceFiles="@(SrcFiles)" DestinationFolder="..\_Build\$(Configuration)\dotnet-utils\%(RecursiveDir)" />
   </Target>
 
 </Project>

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0; net7.0; net6.0; net48; netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>net8.0; net7.0; net6.0; netstandard2.1</TargetFrameworks>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <RootNamespace>Utils.FSharp</RootNamespace>
   </PropertyGroup>
@@ -10,7 +10,6 @@
     <Compile Include="Option.fs" />
     <Compile Include="Math.fs" />
     <Compile Include="DateTime.fs" />
-    <Compile Include="Tree.fs" />
     <Compile Include="KeyValuePair.fs" />
     <Compile Include="Dictionary.fs" />
   </ItemGroup>
@@ -23,7 +22,7 @@
     <ItemGroup>
       <SrcFiles Include="$(TargetDir)**\*.*" />
     </ItemGroup>
-    <Copy SourceFiles="@(SrcFiles)" DestinationFolder="..\Build\$(Configuration)\dotnet-utils-fsharp\%(RecursiveDir)" />
+    <Copy SourceFiles="@(SrcFiles)" DestinationFolder="..\_Build\$(Configuration)\dotnet-utils-fsharp\%(RecursiveDir)" />
   </Target>
 
 </Project>

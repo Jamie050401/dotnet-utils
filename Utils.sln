@@ -5,9 +5,9 @@ VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FSharpUtils", "FSharpUtils\FSharpUtils.fsproj", "{BF683BD7-456E-4076-881A-D4D433DE23EB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSharpUtils", "CSharpUtils\CSharpUtils.csproj", "{C72DD6FE-3F1D-4B65-8875-9E8C97491EFA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utils", "Utils\Utils.csproj", "{C72DD6FE-3F1D-4B65-8875-9E8C97491EFA}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharpUtils.Tests", "FSharpUtils.Tests\FSharpUtils.Tests.fsproj", "{B10AD680-40B6-4DF7-925C-DB5F8C4BF433}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FSharpUtils.Tests", "FSharpUtils.Tests\FSharpUtils.Tests.fsproj", "{B10AD680-40B6-4DF7-925C-DB5F8C4BF433}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
