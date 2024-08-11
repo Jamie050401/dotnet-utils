@@ -86,9 +86,7 @@ public class AsyncQueue<T>
                         action(item);
 
                         if (IsEmpty)
-                        {
                             EmptyWaitHandle.Reset();
-                        }
                     }
                 }
             }
@@ -98,7 +96,7 @@ public class AsyncQueue<T>
             }
         }
 
-        Task.Run(() => Enumerate(), Token);
+        Task.Run(Enumerate, Token);
     }
 
     public bool IsEmpty { get => Queue.IsEmpty; }
