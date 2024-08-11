@@ -1,6 +1,6 @@
 ﻿using Utils.CSharp.Queues;
 
-var queue = AsyncQueue<Action>.Create(5);
+var queue = AsyncQueueFactory.CreateAutomaticActionQueue(5);
 
 var random = new Random();
 Enumerable
