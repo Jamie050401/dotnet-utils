@@ -7,9 +7,8 @@ public class AsyncQueue<T> : IDisposable where T : notnull
     public AsyncQueue(Action<T> onDequeue, int degreeOfParallelisation = 1)
     {
         OnDequeue = onDequeue;
-        Semaphore = new(degreeOfParallelisation);
 
-        for (int i = 0; i <degreeOfParallelisation; i++)
+        for (int i = 0; i < degreeOfParallelisation; i++)
             ThreadPool.QueueUserWorkItem(Loop);
     }
 
@@ -19,7 +18,6 @@ public class AsyncQueue<T> : IDisposable where T : notnull
         ResetEvent.Set();
 
         Thread.Sleep(100);
-        Semaphore.Dispose();
         ResetEvent.Dispose();
 
         GC.SuppressFinalize(this);
@@ -53,30 +51,20 @@ public class AsyncQueue<T> : IDisposable where T : notnull
 
     private bool TryDequeue()
     {
-        Semaphore.Wait();
+        var foundItem = false;
 
-        try
+        while (Queue.TryDequeue(out var tuple))
         {
-            var foundItem = false;
-
-            while (Queue.TryDequeue(out var tuple))
-            {
-                foundItem = true;
-                OnDequeue(tuple.Item);
-                tuple.Event.Set();
-            }
-
-            return foundItem;
+            foundItem = true;
+            OnDequeue(tuple.Item);
+            tuple.Event.Set();
         }
-        finally
-        {
-            Semaphore.Release();
-        }
+
+        return foundItem;
     }
 
     private CancellationToken CancellationToken { get; } = new();
     private Action<T> OnDequeue { get; }
     private ConcurrentQueue<(T Item, ManualResetEventSlim Event)> Queue { get; } = new();
     private ManualResetEventSlim ResetEvent { get; } = new(false);
-    private SemaphoreSlim Semaphore { get; }
 }
