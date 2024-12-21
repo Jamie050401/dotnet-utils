@@ -1,110 +1,82 @@
 ﻿using System.Collections.Concurrent;
-using Utils.CSharp.Extensions;
 
 namespace Utils.CSharp.Queues;
 
-public static class AsyncQueueFactory
+public class AsyncQueue<T> : IDisposable where T : notnull
 {
-    public static AsyncQueue<Action> CreateAutomaticActionQueue(int threadCount = 1) => new(action => action(), threadCount);
-    public static AsyncQueue<Action> CreateManualActionQueue(int threadCount = 1) => new(threadCount);
-}
-
-public class AsyncQueue<T>
-{
-    internal AsyncQueue(int threadCount = 1)
+    public AsyncQueue(Action<T> onDequeue, int degreeOfParallelisation = 1)
     {
-        if (threadCount < 1)
-            throw new ArgumentException($"{nameof(threadCount)} cannot be less than one.");
+        OnDequeue = onDequeue;
+        Semaphore = new(degreeOfParallelisation);
 
-        ProcessingSemaphore = new(threadCount);
-        ThreadCount = threadCount;
+        for (int i = 0; i <degreeOfParallelisation; i++)
+            ThreadPool.QueueUserWorkItem(Loop);
     }
 
-    internal AsyncQueue(Action<T> action, int threadCount = 1)
+    public void Dispose()
     {
-        if (threadCount < 1)
-            throw new ArgumentException($"{nameof(threadCount)} cannot be less than one.");
+        CancellationTokenSource.CreateLinkedTokenSource(CancellationToken).Cancel();
+        ResetEvent.Set();
 
-        Action = action;
-        IsStopped = false;
-        ProcessingSemaphore = new(threadCount);
-        ThreadCount = threadCount;
+        Thread.Sleep(100);
+        Semaphore.Dispose();
+        ResetEvent.Dispose();
 
-        Enumerable
-            .Range(1, threadCount)
-            .ForEach(_ => Enumerate(action));
+        GC.SuppressFinalize(this);
     }
 
-    public void Enqueue(T item)
+    public async Task Enqueue(T item)
     {
-        Queue.Enqueue(item);
-
-        if (!EmptyWaitHandle.IsSet)
-            EmptyWaitHandle.Set();
-    }
-
-    public void Restart()
-    {
-        if (!Token.IsCancellationRequested && Action is not null)
-            Start(Action);
-    }
-
-    public void Start(Action<T> action)
-    {
-        if (!IsStopped)
-            return;
-
-        Action = action;
-        IsStopped = false;
-        Token = new();
-
-        Enumerable
-            .Range(1, ThreadCount)
-            .ForEach(_ => Enumerate(action));
-    }
-
-    public void Stop()
-    {
-        IsStopped = true;
-        CancellationTokenSource.CreateLinkedTokenSource(Token).Cancel(); // TODO: Need to ensure the cancellation doesn't loose items from the queue if it is mid processing
-    }
-
-    private void Enumerate(Action<T> action)
-    {
-        async Task Enumerate()
+        var itemResetEvent = new ManualResetEventSlim(false);
+        Queue.Enqueue((item, itemResetEvent));
+        ResetEvent.Set();
+        await Task.Run(() =>
         {
-            await ProcessingSemaphore.WaitAsync();
-
-            try
-            {
-                while (true)
-                {
-                    EmptyWaitHandle.Wait();
-
-                    if (Queue.TryDequeue(out var item))
-                    {
-                        action(item);
-
-                        if (IsEmpty)
-                            EmptyWaitHandle.Reset();
-                    }
-                }
-            }
-            finally
-            {
-                ProcessingSemaphore.Release();
-            }
-        }
-
-        Task.Run(Enumerate, Token);
+            itemResetEvent.Wait();
+            itemResetEvent.Dispose();
+        });
     }
 
-    public bool IsEmpty { get => Queue.IsEmpty; }
-    private Action<T>? Action { get; set; } // This action defines the logic to be applied to each element in the queue.
-    private ManualResetEventSlim EmptyWaitHandle { get; } = new(); // This manual reset event is used to halt the processing loop whenever the queue is empty.
-    private bool IsStopped { get; set; } = true;
-    private SemaphoreSlim ProcessingSemaphore { get; } // This semaphore is used to restrict the number of threads that can be processing the queue at any given moment.
-    private ConcurrentQueue<T> Queue { get; } = new();
-    private int ThreadCount { get; }
-    private CancellationToken Token { get; set; } = new();
+    private void Loop(object? stateInfo)
+    {
+        while (!CancellationToken.IsCancellationRequested)
+        {
+            ResetEvent.Wait();
+
+            if (CancellationToken.IsCancellationRequested)
+                return;
+
+            if (!TryDequeue())
+                ResetEvent.Reset();
+        }
+    }
+
+    private bool TryDequeue()
+    {
+        Semaphore.Wait();
+
+        try
+        {
+            var foundItem = false;
+
+            while (Queue.TryDequeue(out var tuple))
+            {
+                foundItem = true;
+                OnDequeue(tuple.Item);
+                tuple.Event.Set();
+            }
+
+            return foundItem;
+        }
+        finally
+        {
+            Semaphore.Release();
+        }
+    }
+
+    private CancellationToken CancellationToken { get; } = new();
+    private Action<T> OnDequeue { get; }
+    private ConcurrentQueue<(T Item, ManualResetEventSlim Event)> Queue { get; } = new();
+    private ManualResetEventSlim ResetEvent { get; } = new(false);
+    private SemaphoreSlim Semaphore { get; }
 }

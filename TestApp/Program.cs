@@ -1,16 +1,18 @@
 ﻿using Utils.CSharp.Queues;
 
-var queue = AsyncQueueFactory.CreateAutomaticActionQueue(5);
+using var queue = new AsyncQueue<Action>(action => action(), degreeOfParallelisation: 16);
 
 var random = new Random();
-Enumerable
+
+var tasks = Enumerable
     .Range(1, 100)
-    .ToList()
-    .ForEach(count => queue.Enqueue(() =>
+    .ToArray()
+    .Select(count => queue.Enqueue(() =>
     {
-        Thread.Sleep(random.Next(5000));
+        Thread.Sleep(random.Next(1000));
         Console.WriteLine($"Message {count} from queue! On thread {Environment.CurrentManagedThreadId}");
     }));
 
-Console.WriteLine($"Press ENTER to close this window ...{Environment.NewLine}"); Console.ReadLine();
-queue.Stop();
+await Task.WhenAll(tasks);
+
+Console.WriteLine("Finished");
