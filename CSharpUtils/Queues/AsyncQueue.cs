@@ -2,9 +2,16 @@
 
 namespace Utils.CSharp.Queues;
 
-public class AsyncQueue<T> : IDisposable where T : notnull
+public static class AsyncQueueFactory
 {
-    public AsyncQueue(Action<T> onDequeue, int degreeOfParallelisation = 1)
+    public static AsyncQueue<T> Create<T>(Func<T, Task> onDequeue, int degreeOfParallelisation = 1) => new(item => onDequeue(item).Wait(), degreeOfParallelisation);
+
+    public static AsyncQueue<T> Create<T>(Action<T> onDequeue, int degreeOfParallelisation = 1) => new(onDequeue, degreeOfParallelisation);
+}
+
+public class AsyncQueue<T> : IDisposable
+{
+    internal AsyncQueue(Action<T> onDequeue, int degreeOfParallelisation)
     {
         OnDequeue = onDequeue;
 
@@ -17,7 +24,6 @@ public class AsyncQueue<T> : IDisposable where T : notnull
         CancellationTokenSource.CreateLinkedTokenSource(CancellationToken).Cancel();
         ResetEvent.Set();
 
-        Thread.Sleep(100);
         ResetEvent.Dispose();
 
         GC.SuppressFinalize(this);
@@ -25,14 +31,12 @@ public class AsyncQueue<T> : IDisposable where T : notnull
 
     public async Task Enqueue(T item)
     {
-        var itemResetEvent = new ManualResetEventSlim(false);
-        Queue.Enqueue((item, itemResetEvent));
+        var isComplete = false;
+        Queue.Enqueue((item, () => isComplete = true));
         ResetEvent.Set();
-        await Task.Run(() =>
-        {
-            itemResetEvent.Wait();
-            itemResetEvent.Dispose();
-        });
+
+        while (!isComplete)
+            await Task.Delay(10);
     }
 
     private void Loop(object? stateInfo)
@@ -44,27 +48,19 @@ public class AsyncQueue<T> : IDisposable where T : notnull
             if (CancellationToken.IsCancellationRequested)
                 return;
 
-            if (!TryDequeue())
+            if (!Queue.TryDequeue(out var item))
+            {
                 ResetEvent.Reset();
+                continue;
+            }
+
+            OnDequeue(item.Value);
+            item.IsComplete();
         }
-    }
-
-    private bool TryDequeue()
-    {
-        var foundItem = false;
-
-        while (Queue.TryDequeue(out var tuple))
-        {
-            foundItem = true;
-            OnDequeue(tuple.Item);
-            tuple.Event.Set();
-        }
-
-        return foundItem;
     }
 
     private CancellationToken CancellationToken { get; } = new();
     private Action<T> OnDequeue { get; }
-    private ConcurrentQueue<(T Item, ManualResetEventSlim Event)> Queue { get; } = new();
+    private ConcurrentQueue<(T Value, Func<bool> IsComplete)> Queue { get; } = new();
     private ManualResetEventSlim ResetEvent { get; } = new(false);
 }
