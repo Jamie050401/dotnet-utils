@@ -4,15 +4,16 @@ namespace Utils.CSharp.Queues;
 
 public static class AsyncQueueFactory
 {
-    public static AsyncQueue<T> Create<T>(Func<T, Task> onDequeue, int degreeOfParallelisation = 1) => new(item => onDequeue(item).Wait(), degreeOfParallelisation);
+    public static AsyncQueue<T> Create<T>(Func<T, Task> onDequeue, int degreeOfParallelisation = 1, int intervalDelay = 10) => new(item => onDequeue(item).Wait(), degreeOfParallelisation, intervalDelay);
 
-    public static AsyncQueue<T> Create<T>(Action<T> onDequeue, int degreeOfParallelisation = 1) => new(onDequeue, degreeOfParallelisation);
+    public static AsyncQueue<T> Create<T>(Action<T> onDequeue, int degreeOfParallelisation = 1, int intervalDelay = 10) => new(onDequeue, degreeOfParallelisation, intervalDelay);
 }
 
 public class AsyncQueue<T> : IDisposable
 {
-    internal AsyncQueue(Action<T> onDequeue, int degreeOfParallelisation)
+    internal AsyncQueue(Action<T> onDequeue, int degreeOfParallelisation, int intervalDelay)
     {
+        IntervalDelay = intervalDelay;
         OnDequeue = onDequeue;
 
         for (int i = 0; i < degreeOfParallelisation; i++)
@@ -36,7 +37,7 @@ public class AsyncQueue<T> : IDisposable
         ResetEvent.Set();
 
         while (!isComplete)
-            await Task.Delay(10);
+            await Task.Delay(IntervalDelay);
     }
 
     private void Loop(object? stateInfo)
@@ -60,6 +61,7 @@ public class AsyncQueue<T> : IDisposable
     }
 
     private CancellationToken CancellationToken { get; } = new();
+    private int IntervalDelay { get; }
     private Action<T> OnDequeue { get; }
     private ConcurrentQueue<(T Value, Func<bool> IsComplete)> Queue { get; } = new();
     private ManualResetEventSlim ResetEvent { get; } = new(false);
