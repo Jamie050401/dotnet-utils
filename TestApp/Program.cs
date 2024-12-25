@@ -12,7 +12,7 @@ var tasksOne = Enumerable
         await Task.Delay(random.Next(100));
     }));
 
-await Task.WhenAll(tasksOne).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
+await Task.WhenAll(tasksOne);
 
 Console.WriteLine($"{Environment.NewLine}Finished processing queue one.{Environment.NewLine}");
 
@@ -26,6 +26,6 @@ var tasksTwo = Enumerable
         Thread.Sleep(random.Next(100));
     }));
 
-await Task.WhenAll(tasksTwo).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
+await Task.WhenAll(tasksTwo);
 
 Console.WriteLine($"{Environment.NewLine}Finished processing queue two.");
