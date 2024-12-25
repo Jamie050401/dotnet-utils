@@ -2,9 +2,9 @@
 
 namespace Utils.CSharp.Queues;
 
-public class AsyncQueue<T>(Action<T> onDequeue, int degreeOfParallelisation = 1, int intervalDelay = 10) : IDisposable
+public class AsyncQueue<T>(Action<T> onDequeue, int degreeOfParallelisation = 1, int intervalDelay = 10, int maxRetries = 3) : IDisposable
 {
-    public AsyncQueue(Func<T, Task> onDequeue, int degreeOfParallelisation = 1, int intervalDelay = 10) : this(item => onDequeue(item).GetAwaiter().GetResult(), degreeOfParallelisation: degreeOfParallelisation, intervalDelay: intervalDelay)
+    public AsyncQueue(Func<T, Task> onDequeue, int degreeOfParallelisation = 1, int intervalDelay = 10, int maxRetries = 3) : this(item => onDequeue(item).GetAwaiter().GetResult(), degreeOfParallelisation: degreeOfParallelisation, intervalDelay: intervalDelay, maxRetries: maxRetries)
     {
 
     }
@@ -38,7 +38,7 @@ public class AsyncQueue<T>(Action<T> onDequeue, int degreeOfParallelisation = 1,
         {
             Semaphore.Wait();
 
-            var count = 1;
+            var retryCount = 1;
             while (!CancellationToken.IsCancellationRequested)
             {
                 if (CancellationToken.IsCancellationRequested)
@@ -46,10 +46,10 @@ public class AsyncQueue<T>(Action<T> onDequeue, int degreeOfParallelisation = 1,
 
                 if (!Queue.TryDequeue(out var item))
                 {
-                    if (count > 3)
+                    if (retryCount > maxRetries)
                         return;
 
-                    count++;
+                    retryCount++;
                     Thread.Sleep(intervalDelay);
                     continue;
                 }
