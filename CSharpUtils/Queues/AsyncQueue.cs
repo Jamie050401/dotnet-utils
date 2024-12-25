@@ -4,11 +4,12 @@ namespace Utils.CSharp.Queues;
 
 public static class AsyncQueueFactory
 {
-    public static AsyncQueue<T> Create<T>(Func<T, Task> onDequeue, int degreeOfParallelisation = 1, int intervalDelay = 10) => new(item => onDequeue(item).Wait(), degreeOfParallelisation, intervalDelay);
+    public static AsyncQueue<T> Create<T>(Func<T, Task> onDequeue, int degreeOfParallelisation = 1, int intervalDelay = 10) => new(item => onDequeue(item).GetAwaiter().GetResult(), degreeOfParallelisation, intervalDelay);
 
     public static AsyncQueue<T> Create<T>(Action<T> onDequeue, int degreeOfParallelisation = 1, int intervalDelay = 10) => new(onDequeue, degreeOfParallelisation, intervalDelay);
 }
 
+// TODO: Look at making background threads temporary, hold onto them for a finite duration once empty and then terminate (with logic in the Enqueue function to kick off new threads where necessary)
 public class AsyncQueue<T> : IDisposable
 {
     internal AsyncQueue(Action<T> onDequeue, int degreeOfParallelisation, int intervalDelay)
