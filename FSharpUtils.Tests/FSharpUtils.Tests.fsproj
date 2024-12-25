@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Math.fs" />
     <Compile Include="DateTime.fs" />
   </ItemGroup>
 

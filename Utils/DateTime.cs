@@ -34,7 +34,7 @@ public static class DateTimeExtensions
 
     public static double GetMonthsBetweenTwoDates(this DateTime d1, DateTime d2)
     {
-        return FSharp.DateTime.getMonthsBetweenTwoDates(d1, d2);
+        throw new NotImplementedException(); //return FSharp.DateTime.getMonthsBetweenTwoDates(d1, d2);
     }
 
     public static int GetCompleteMonthsBetweenTwoDates(this DateTime d1, DateTime d2)
