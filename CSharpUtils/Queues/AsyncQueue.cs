@@ -50,6 +50,7 @@ public class AsyncQueue<T>(Action<T> onDequeue, int degreeOfParallelisation = 1,
                         return;
 
                     count++;
+                    Thread.Sleep(intervalDelay);
                     continue;
                 }
 
