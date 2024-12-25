@@ -2,32 +2,17 @@
 
 namespace Utils.CSharp.Queues;
 
-public static class AsyncQueueFactory
+public class AsyncQueue<T>(Action<T> onDequeue, int degreeOfParallelisation = 1, int intervalDelay = 10) : IDisposable
 {
-    public static AsyncQueue<T> Create<T>(Func<T, Task> onDequeue, int degreeOfParallelisation = 1, int intervalDelay = 10) => new(item => onDequeue(item).GetAwaiter().GetResult(), degreeOfParallelisation, intervalDelay);
-
-    public static AsyncQueue<T> Create<T>(Action<T> onDequeue, int degreeOfParallelisation = 1, int intervalDelay = 10) => new(onDequeue, degreeOfParallelisation, intervalDelay);
-}
-
-// TODO: Look at making background threads temporary, hold onto them for a finite duration once empty and then terminate (with logic in the Enqueue function to kick off new threads where necessary)
-public class AsyncQueue<T> : IDisposable
-{
-    internal AsyncQueue(Action<T> onDequeue, int degreeOfParallelisation, int intervalDelay)
+    public AsyncQueue(Func<T, Task> onDequeue, int degreeOfParallelisation = 1, int intervalDelay = 10) : this(item => onDequeue(item).GetAwaiter().GetResult(), degreeOfParallelisation: degreeOfParallelisation, intervalDelay: intervalDelay)
     {
-        IntervalDelay = intervalDelay;
-        OnDequeue = onDequeue;
 
-        for (int i = 0; i < degreeOfParallelisation; i++)
-            ThreadPool.QueueUserWorkItem(Loop);
     }
 
     public void Dispose()
     {
         CancellationTokenSource.CreateLinkedTokenSource(CancellationToken).Cancel();
-        ResetEvent.Set();
-
-        ResetEvent.Dispose();
-
+        Semaphore.Dispose();
         GC.SuppressFinalize(this);
     }
 
@@ -35,35 +20,77 @@ public class AsyncQueue<T> : IDisposable
     {
         var isComplete = false;
         Queue.Enqueue((item, () => isComplete = true));
-        ResetEvent.Set();
+        Start();
 
         while (!isComplete)
-            await Task.Delay(IntervalDelay);
+            await Task.Delay(intervalDelay).ConfigureAwait(false);
+    }
+
+    public AsyncQueue<T> WithExceptionHandler(Action<Exception> onException)
+    {
+        OnException = onException;
+        return this;
     }
 
     private void Loop(object? stateInfo)
     {
-        while (!CancellationToken.IsCancellationRequested)
+        try
         {
-            ResetEvent.Wait();
+            Semaphore.Wait();
 
-            if (CancellationToken.IsCancellationRequested)
-                return;
-
-            if (!Queue.TryDequeue(out var item))
+            var count = 1;
+            while (!CancellationToken.IsCancellationRequested)
             {
-                ResetEvent.Reset();
-                continue;
-            }
+                if (CancellationToken.IsCancellationRequested)
+                    return;
 
-            OnDequeue(item.Value);
-            item.IsComplete();
+                if (!Queue.TryDequeue(out var item))
+                {
+                    if (count > 3)
+                        return;
+
+                    count++;
+                    continue;
+                }
+
+                try
+                {
+                    onDequeue(item.Value);
+                }
+                catch (Exception ex)
+                {
+                    if (OnException == null)
+                    {
+                        Faults.Add(ex);
+                        continue;
+                    }
+
+                    OnException(ex);
+                }
+                finally
+                {
+                    item.IsComplete();
+                }
+            }
+        }
+        finally
+        {
+            Semaphore.Release();
         }
     }
 
+    private void Start()
+    {
+        if (!(Semaphore.CurrentCount > 0))
+            return;
+
+        for (var i = Semaphore.CurrentCount; i > 0; i--)
+            ThreadPool.QueueUserWorkItem(Loop);
+    }
+
     private CancellationToken CancellationToken { get; } = new();
-    private int IntervalDelay { get; }
-    private Action<T> OnDequeue { get; }
+    private ConcurrentBag<Exception> Faults { get; } = [];
+    private Action<Exception>? OnException { get; set; }
     private ConcurrentQueue<(T Value, Func<bool> IsComplete)> Queue { get; } = new();
-    private ManualResetEventSlim ResetEvent { get; } = new(false);
+    private SemaphoreSlim Semaphore { get; } = new(degreeOfParallelisation);
 }
